@@ -9,108 +9,153 @@
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
         .container { max-width: 900px; margin: auto; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .summary-bar { display: none; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-around; font-weight: bold; }
-        .entry-section { display: flex; gap: 8px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px; align-items: center; }
-        input, select, button { padding: 10px; border-radius: 5px; border: 1px solid #ddd; }
+        
+        #header-project-name { margin: 0; font-size: 24px; }
+        #header-project-value { margin: 0; font-size: 16px; color: #d32f2f; font-weight: bold; }
+        
+        .summary-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .box { flex: 1; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; border: 1px solid rgba(0,0,0,0.05); }
+        .box-purchase { background-color: #e3f2fd; color: #1565c0; }
+        .box-labor { background-color: #f1f8e9; color: #2e7d32; }
+        .box-total { background-color: #fff3e0; color: #ef6c00; }
+        .box-profit { background-color: #e0f2f1; color: #00695c; }
+
+        .entry-section { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .action-row { display: flex; gap: 8px; }
+        input, select, button { padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
+        .btn-add { background: #27ae60; color: white; border: none; cursor: pointer; padding: 0 20px; }
+        .btn-del { background: #e74c3c; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        
+        .head-material { background-color: #e3f2fd; padding: 10px; border-radius: 5px; color: #1976d2; }
+        .head-labor { background-color: #f1f8e9; padding: 10px; border-radius: 5px; color: #388e3c; }
+
         table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 30px; }
-        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
-        th { background: #f8f8f8; }
-        .btn-add { background: #27ae60; color: white; border: none; cursor: pointer; }
-        .btn-del { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        th { background-color: #f8f9fa; padding: 12px; border: 1px solid #ddd; text-align: center; }
+        td { padding: 10px; border: 1px solid #eee; text-align: center; }
+        
+        @media print {
+            .header-row > div:not(.print-header), .entry-section, .action-col { display: none !important; }
+            .print-header { display: block !important; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-row">
-        <h1 id="header-project-name" style="margin:0;">Select a Project</h1>
+        <div class="print-header">
+            <h1 id="header-project-name">Select Project</h1>
+            <p id="header-project-value"></p>
+        </div>
         <div>
-            <select id="project-switcher" onchange="switchProject()"></select>
+            <select id="project-switcher" onchange="switchProject()"><option value="">-- Select Project --</option></select>
             <button onclick="createNewProject()">+ New</button>
             <button onclick="deleteProject()" style="background:#e74c3c; color:white;">Delete</button>
+            <button onclick="window.print()">Print</button>
         </div>
     </div>
 
-    <div id="summary-bar" class="summary-bar">
-        <span>Purchases: <span id="sum-purchase">₹0</span></span>
-        <span>Labor: <span id="sum-labor">₹0</span></span>
-        <span>Total: <span id="sum-total">₹0</span></span>
-        <span>Profit/Loss: <span id="sum-profit">₹0</span></span>
+    <div class="summary-bar">
+        <div class="box box-purchase">Purchases<br><span id="sum-purchase">₹0</span></div>
+        <div class="box box-labor">Labor<br><span id="sum-labor">₹0</span></div>
+        <div class="box box-total">Total<br><span id="sum-total">₹0</span></div>
+        <div class="box box-profit">Profit/Loss<br><span id="sum-profit">₹0</span></div>
     </div>
 
-    <h3>New Entry</h3>
     <div class="entry-section">
-        <input type="date" id="date">
-        <input type="text" id="party" placeholder="Party Name" style="flex:2;">
-        <input type="text" id="bill" placeholder="Bill No" style="flex:1;">
-        <input type="number" id="qty" placeholder="Qty" style="width:60px;">
-        <input type="number" id="amt" placeholder="Amount" style="width:100px;">
-        <select id="category"><option value="purchase">Material</option><option value="labor">Labor</option></select>
-        <button class="btn-add" onclick="addEntry()">Add Entry</button>
+        <div class="input-row">
+            <input type="date" id="date">
+            <input type="text" id="party" placeholder="Party Name" style="flex:2;">
+            <input type="text" id="bill" placeholder="Bill" style="width:60px;">
+            <input type="number" id="qty" placeholder="Qty" style="width:50px;">
+            <input type="number" id="amt" placeholder="Amt" style="width:80px;">
+            <select id="category"><option value="purchase">Material</option><option value="labor">Labor</option></select>
+        </div>
+        <div class="action-row">
+            <input type="text" id="note" placeholder="Notes" style="flex:1;">
+            <button class="btn-add" onclick="addEntry()">Add Entry</button>
+        </div>
     </div>
 
-    <h3>Material Purchases</h3>
-    <table><thead><tr><th>Date</th><th>Party</th><th>Bill</th><th>Qty</th><th>Amt</th><th>Action</th></tr></thead><tbody id="purchase-body"></tbody></table>
-
-    <h3>Installation & Labor</h3>
-    <table><thead><tr><th>Date</th><th>Party</th><th>Bill</th><th>Qty</th><th>Amt</th><th>Action</th></tr></thead><tbody id="labor-body"></tbody></table>
+    <h3 class="head-material">Material Purchases</h3>
+    <table><thead><tr><th>Date</th><th>Party Name</th><th>Bill</th><th>Qty</th><th>Amt</th><th class="action-col">Action</th></tr></thead><tbody id="purchase-body"></tbody></table>
+    <h3 class="head-labor">Installation & Labor</h3>
+    <table><thead><tr><th>Date</th><th>Party Name</th><th>Bill</th><th>Qty</th><th>Amt</th><th class="action-col">Action</th></tr></thead><tbody id="labor-body"></tbody></table>
 </div>
+
+
 
 <script>
     const firebaseConfig = { databaseURL: "https://all-projects-pl-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let currentPid = localStorage.getItem('currentPid') || '';
-    let currentContractVal = 0;
+    const toTC = (s) => s.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-    db.ref('projects').on('value', (s) => {
-        const sel = document.getElementById('project-switcher');
-        sel.innerHTML = '<option value="">-- Projects --</option>';
-        s.forEach((c) => {
-            const opt = document.createElement('option');
-            opt.value = c.key;
-            opt.innerText = c.val().info?.name || "Unnamed";
-            sel.appendChild(opt);
+    document.addEventListener("DOMContentLoaded", () => {
+        db.ref('projects').once('value', (s) => {
+            const sel = document.getElementById('project-switcher');
+            s.forEach(c => {
+                let o = document.createElement('option');
+                o.value = c.key; o.innerText = c.val().info?.name || "Unnamed";
+                sel.appendChild(o);
+            });
         });
-        sel.value = currentPid;
-        if(currentPid) loadProjectData();
     });
 
-    function loadProjectData() {
-        if (!currentPid) return;
-        document.getElementById('summary-bar').style.display = 'flex';
-        db.ref(`projects/${currentPid}/info`).on('value', (s) => {
-            const d = s.val() || {};
-            document.getElementById('header-project-name').innerText = d.name || "N/A";
-            currentContractVal = parseFloat(d.value) || 0;
-        });
-
-        db.ref(`projects/${currentPid}/entries`).on('value', (s) => {
-            document.getElementById('purchase-body').innerHTML = '';
-            document.getElementById('labor-body').innerHTML = '';
-            let p = 0, l = 0;
-            s.forEach((c) => {
-                const item = c.val();
-                const amt = parseFloat(item.amt) || 0;
-                const row = `<tr><td>${item.date}</td><td>${item.party}</td><td>${item.bill}</td><td>${item.qty}</td><td>₹${amt}</td><td><button class="btn-del" onclick="deleteEntry('${c.key}')">×</button></td></tr>`;
-                if(item.cat === 'purchase') { document.getElementById('purchase-body').innerHTML += row; p += amt; }
-                else { document.getElementById('labor-body').innerHTML += row; l += amt; }
+    function switchProject() {
+        const pid = document.getElementById('project-switcher').value;
+        if(!pid) return;
+        db.ref(`projects/${pid}/info`).on('value', (s) => {
+            const i = s.val();
+            document.getElementById('header-project-name').innerText = i?.name || "N/A";
+            document.getElementById('header-project-value').innerText = "Project Value: ₹" + (i?.value || 0);
+            db.ref(`projects/${pid}/entries`).on('value', (s) => {
+                let p = 0, l = 0;
+                document.getElementById('purchase-body').innerHTML = '';
+                document.getElementById('labor-body').innerHTML = '';
+                s.forEach((c) => {
+                    const item = c.val();
+                    const a = parseFloat(item.amt) || 0;
+                    const row = `<tr><td>${item.date}</td><td>${item.party}<br><small style="color:#888;">${item.note||''}</small></td><td>${item.bill}</td><td>${item.qty}</td><td>₹${a}</td><td class="action-col"><button class="btn-del" onclick="deleteEntry('${pid}','${c.key}')">X</button></td></tr>`;
+                    if(item.cat === 'purchase') { document.getElementById('purchase-body').innerHTML += row; p += a; }
+                    else { document.getElementById('labor-body').innerHTML += row; l += a; }
+                });
+                document.getElementById('sum-purchase').innerText = '₹' + p;
+                document.getElementById('sum-labor').innerText = '₹' + l;
+                document.getElementById('sum-total').innerText = '₹' + (p + l);
+                document.getElementById('sum-profit').innerText = '₹' + ((parseFloat(i?.value)||0) - (p + l));
             });
-            document.getElementById('sum-purchase').innerText = '₹' + p;
-            document.getElementById('sum-labor').innerText = '₹' + l;
-            document.getElementById('sum-total').innerText = '₹' + (p + l);
-            const profit = currentContractVal - (p + l);
-            const pEl = document.getElementById('sum-profit');
-            pEl.innerText = '₹' + profit;
-            pEl.style.color = profit >= 0 ? "#27ae60" : "#e74c3c";
         });
     }
 
-    function switchProject() { currentPid = document.getElementById('project-switcher').value; localStorage.setItem('currentPid', currentPid); location.reload(); }
-    function createNewProject() { const name = prompt("Name:"); const val = prompt("Contract Value:"); if(!name) return; const k = db.ref('projects').push().key; db.ref(`projects/${k}/info`).set({name, value:val}); localStorage.setItem('currentPid', k); location.reload(); }
-    function deleteProject() { if(confirm("Delete project?")) { db.ref(`projects/${currentPid}`).remove(); localStorage.removeItem('currentPid'); location.reload(); } }
-    function deleteEntry(k) { if(confirm("Delete?")) db.ref(`projects/${currentPid}/entries/${k}`).remove(); }
-    function addEntry() { const data = { date: document.getElementById('date').value, party: document.getElementById('party').value, bill: document.getElementById('bill').value, qty: document.getElementById('qty').value, amt: document.getElementById('amt').value, cat: document.getElementById('category').value }; if(!currentPid) return alert("Select project!"); db.ref(`projects/${currentPid}/entries`).push(data); }
+    function addEntry() {
+        const pid = document.getElementById('project-switcher').value;
+        if(!pid) return alert("Select project first!");
+        db.ref(`projects/${pid}/entries`).push({
+            date: document.getElementById('date').value,
+            party: toTC(document.getElementById('party').value),
+            note: toTC(document.getElementById('note').value),
+            bill: document.getElementById('bill').value.toUpperCase(),
+            qty: document.getElementById('qty').value,
+            amt: document.getElementById('amt').value,
+            cat: document.getElementById('category').value
+        });
+        document.querySelectorAll('input').forEach(i => { if(i.type !== 'date' && i.type !== 'select-one') i.value = ''; });
+    }
+
+    function createNewProject() { 
+        let n = prompt("Project Name:"), v = prompt("Project Value:"); 
+        if(!n) return;
+        let k = db.ref('projects').push().key;
+        db.ref(`projects/${k}/info`).set({name: toTC(n), value: v || 0});
+        location.reload();
+    }
+    function deleteProject() { 
+        const pid = document.getElementById('project-switcher').value;
+        if(confirm("Delete project?")) { db.ref(`projects/${pid}`).remove(); location.reload(); } 
+    }
+    function deleteEntry(pid, k) { if(confirm("Delete?")) db.ref(`projects/${pid}/entries/${k}`).remove(); }
 </script>
 </body>
 </html>
