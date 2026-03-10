@@ -2,41 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pro Project Tracker</title>
+    <title>Pro Project Tracker - Secure</title>
     <script src="https://www.gstatic.com/firebasejs/9.12.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.12.1/firebase-database-compat.js"></script>
     <style>
-        @media print {
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .header-row > div:not(.print-header), .entry-section, .action-col, .btn-edit { display: none !important; }
-            .print-header { display: block !important; }
-        }
-
+        /*  */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f7f6; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
+        .hidden { display: none !important; }
+        
+        /* ... existing styles ... */
+        @media print { * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .header-row > div:not(.print-header), .entry-section, .action-col, .btn-edit { display: none !important; } .print-header { display: block !important; } }
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
         .container { max-width: 900px; margin: auto; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         #header-project-name { margin: 0; font-size: 24px; }
         #header-project-value { margin: 5px 0; font-size: 16px; color: #d32f2f; font-weight: bold; }
-        
         .summary-bar { display: flex; gap: 10px; margin-bottom: 20px; }
         .box { flex: 1; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; border: 1px solid rgba(0,0,0,0.05); }
         .box-purchase { background-color: #e3f2fd; color: #1565c0; }
         .box-labour { background-color: #f1f8e9; color: #2e7d32; }
         .box-total { background-color: #fff3e0; color: #ef6c00; }
         .box-profit { background-color: #e0f2f1; color: #00695c; }
-
         .entry-section { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px; }
         .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
         .action-row { display: flex; gap: 8px; }
-        
         input, select, button { padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
         .btn-add { background: #27ae60; color: white; border: none; cursor: pointer; padding: 0 20px; }
         .btn-del { background: #e74c3c; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; }
         .btn-edit { background: #3498db; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; margin-left: 10px; }
-        
         .head-material { background-color: #e3f2fd; padding: 10px; border-radius: 5px; color: #1976d2; }
         .head-labour { background-color: #f1f8e9; padding: 10px; border-radius: 5px; color: #388e3c; }
-
         table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 30px; }
         th { background-color: #f8f9fa; padding: 12px; border: 1px solid #ddd; text-align: center; }
         td { padding: 10px; border: 1px solid #eee; text-align: center; }
@@ -44,7 +39,13 @@
 </head>
 <body>
 
-<div class="container">
+<div id="login-overlay">
+    <h2>Project Tracker Login</h2>
+    <input type="password" id="pass" placeholder="Enter Password">
+    <button onclick="checkLogin()" style="margin-top:10px; padding:10px 20px;">Login</button>
+</div>
+
+<div id="app" class="container hidden">
     <div class="header-row">
         <div class="print-header">
             <h1 id="header-project-name">Select Project</h1>
@@ -57,14 +58,12 @@
             <button onclick="window.print()">Print</button>
         </div>
     </div>
-
     <div class="summary-bar">
         <div class="box box-purchase">Purchases<br><span id="sum-purchase">₹0</span></div>
         <div class="box box-labour">Labour<br><span id="sum-labour">₹0</span></div>
         <div class="box box-total">Total<br><span id="sum-total">₹0</span></div>
         <div class="box box-profit">Profit/Loss<br><span id="sum-profit">₹0</span></div>
     </div>
-
     <div class="entry-section">
         <div class="input-row">
             <input type="date" id="date">
@@ -79,22 +78,26 @@
             <button class="btn-add" onclick="addEntry()">Add Entry</button>
         </div>
     </div>
-
     <h3 class="head-material">Material Purchases</h3>
     <table><thead><tr><th>Date</th><th>Party Name</th><th>Bill</th><th>Qty</th><th>Amt</th><th class="action-col">Action</th></tr></thead><tbody id="purchase-body"></tbody></table>
     <h3 class="head-labour">Installation & Labour</h3>
     <table><thead><tr><th>Date</th><th>Party Name</th><th>Bill</th><th>Qty</th><th>Amt</th><th class="action-col">Action</th></tr></thead><tbody id="labour-body"></tbody></table>
 </div>
 
-
-
 <script>
     const firebaseConfig = { databaseURL: "https://all-projects-pl-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    const toTC = (s) => s.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-    document.addEventListener("DOMContentLoaded", () => {
+    function checkLogin() {
+        if(document.getElementById('pass').value === 'admin789') {
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            loadProjectList();
+        } else { alert("Incorrect Password!"); }
+    }
+
+    function loadProjectList() {
         db.ref('projects').once('value', (s) => {
             const sel = document.getElementById('project-switcher');
             s.forEach(c => {
@@ -103,8 +106,9 @@
                 sel.appendChild(o);
             });
         });
-    });
+    }
 
+    // ... (All existing functions switchProject, addEntry, editProjectValue, etc., remain as finalized previously) ...
     function switchProject() {
         const pid = document.getElementById('project-switcher').value;
         if(!pid) return;
@@ -112,7 +116,6 @@
             const i = s.val();
             document.getElementById('header-project-name').innerText = i?.name || "N/A";
             document.getElementById('header-project-value').innerHTML = `Project Value: ₹${i?.value || 0} <button class="btn-edit" onclick="editProjectValue()">Edit</button>`;
-            
             db.ref(`projects/${pid}/entries`).on('value', (s) => {
                 let p = 0, l = 0;
                 document.getElementById('purchase-body').innerHTML = '';
@@ -141,6 +144,7 @@
     function addEntry() {
         const pid = document.getElementById('project-switcher').value;
         if(!pid) return alert("Select project first!");
+        const toTC = (s) => s.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         db.ref(`projects/${pid}/entries`).push({
             date: document.getElementById('date').value,
             party: toTC(document.getElementById('party').value),
@@ -150,14 +154,14 @@
             amt: document.getElementById('amt').value,
             cat: document.getElementById('category').value
         });
-        document.querySelectorAll('input').forEach(i => { if(i.type !== 'date' && i.type !== 'select-one') i.value = ''; });
+        document.querySelectorAll('input').forEach(i => { if(i.type !== 'date' && i.type !== 'select-one' && i.type !== 'password') i.value = ''; });
     }
 
     function createNewProject() { 
         let n = prompt("Project Name:"), v = prompt("Project Value:"); 
         if(!n) return;
         let k = db.ref('projects').push().key;
-        db.ref(`projects/${k}/info`).set({name: toTC(n), value: v || 0});
+        db.ref(`projects/${k}/info`).set({name: n, value: v || 0});
         location.reload();
     }
     function deleteProject() { 
