@@ -17,8 +17,21 @@
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #aaa; background: none; border: none; padding: 0;}
         .close-btn:hover { color: #333; }
         
-        /* Header & Summaries */
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        /* Header & Summaries (Centered) */
+        .header-row { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            margin-bottom: 25px; 
+            gap: 15px; 
+        }
+        .print-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         #header-project-name { margin: 0; font-size: 24px; }
         #header-project-value { margin: 5px 0; font-size: 16px; color: #d32f2f; font-weight: bold; }
         
@@ -56,7 +69,7 @@
         @media print { 
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } 
             .header-row > div:not(.print-header), .entry-section, .action-col, .btn-edit { display: none !important; } 
-            .print-header { display: block !important; } 
+            .print-header { display: flex !important; } 
             body { background: white; padding: 0; }
             .container { max-width: 100%; box-shadow: none; }
             
